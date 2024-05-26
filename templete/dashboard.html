@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파일 진행 상태 확인</title>
+    <style>
+
+            .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #d6eaff;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            padding: 10px 20px;
+            color: black;
+            background-color: #d6eaff;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #a9d3ff;
+        }
+
+        body{
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        .file-item {
+            border: 1px solid #ddd;
+            margin-top: 8px;
+            padding: 10px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .file-item:hover {
+            background-color: #f9f9f9;
+        }
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-name {
+            font-weight: bold;
+        }
+        .progress {
+            color: #555;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: row;  /* 행 방향 설정 */
+            flex-wrap: wrap;      /* 내용이 넘칠 때 다음 행으로 넘김 */
+            justify-content: space-around; /* 버튼들 사이에 공간을 균등하게 배분 */
+        }
+
+    </style>
+</head>
+<body>
+
+
+    <nav class="navbar">
+        <div class="logo">
+            FAST READING
+        </div>
+        <ul class="nav-links">
+            <li><a href="#">Settings</a></li>
+            <li><a href="/signup">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>파일 대시보드</h1>
+        <h2>파일 업로드:</h2>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept="application/pdf" required>
+            <input type="hidden" name="mode" id="mode" value=""> <!-- Hidden input to hold the mode value -->
+            <div id="buttons">
+                <button type="button" onclick="submitForm(0)">Upload PDF</button>
+                <button type="button" onclick="submitForm(0)">Upload PDF by OCR (Dont work)</button>
+            </div>
+        </form>
+        <h2>파일 목록:</h2>
+
+        <div id="fileList">
+            <!-- 여기에 자바스크립트로 파일 목록을 동적으로 추가합니다 -->
+        {% for pdf in pdfs %}
+        <div class="file-item"><a href="/pdf_reader/{{ pdf.name }}/{{pdf.progress}}/{{pdf.mode}}" class="pdf-link" > {{ pdf.name }} - 진행률: {{ pdf.progress }} </a></div>
+        {% endfor %}
+
+        <script>
+            function submitForm(mode) {
+                document.getElementById('mode').value = mode; // Set the mode value based on the button clicked
+                document.forms[0].submit(); // Submit the form
+            }
+        </script>
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Layout</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .blue {
+            background-color: #2A7CE8;
+            width: 70%;
+            height: 100%;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40%;
+            height: 100%;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .blue {
+                height: 60%;
+                width: 100%;
+                position: relative;
+            }
+
+            .form-container {
+                height: 100%;
+                width: 100%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="blue"></div>
+    <div class="form-container">
+        <div class="container">
+            <h1>이름을 입력하세요</h1>
+            <form action="/login" method="post">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <button type="submit">Enter</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

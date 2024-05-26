@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> playing{{pdf_name}}</title>
+    <style>
+        body, html {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #f0f0f0;
+        }
+        #setting {
+            width: 200px;
+            height: 100vh;
+            background-color: #f0f0f0;
+            position: fixed;
+            top: 0;
+            right: -220px;
+            transition: right 0.5s;
+            padding: 10px;
+        }
+        #textDisplayArea {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            height: 70vh; /* 뷰포트 높이의 70% */
+            width: 90%;
+
+            max-width: 800px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #speedControl {
+            width: 300px;
+            margin: 20px 0;
+        }
+
+        #wordDisplay {
+            position: absolute; /* 절대 위치 설정 */
+            top: 45%; /* 부모 컨테이너 상단으로부터 50% 위치 */
+            left: 50%; /* 부모 컨테이너 왼쪽으로부터 50% 위치 */
+            transform: translate(-50%, -50%); /* 중앙 정렬을 위한 위치 조정*/
+            font-size: 40px;
+            color: blue;
+            cursor: pointer;
+            font-weight: bolder;
+            white-space : nowrap
+        }
+
+        #currentSentence, #nextSentence {
+            font-size: 15px;
+            margin: 10px 0;
+        }
+
+        .animate {
+            animation: changepx 0.5s;
+        }
+
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #d6eaff;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 10px;
+            display: flex;
+            transition: max-height 0.3s ease;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            padding: 10px 20px;
+            color: black;
+            background-color: #d6eaff;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #a9d3ff;
+        }
+
+        .span-container {
+            display: inline-block;
+            padding: 2px;
+            border: 1px solid transparent;
+        }
+
+        .span-container:hover {
+            border-color: black;
+        }
+
+        .page {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px;
+        }
+
+        #index-button {
+            width: 30%;
+            height: 40px;
+        }
+
+        .toggle-button {
+            display: none;
+        }
+
+        .narrow {
+            width: 50%; /* 너비를 줄임 */
+            transition: width 0.5s ease; /* 부드러운 전환 */
+        }
+        @keyframes changepx {
+            from {
+                font-size: 45px;
+            }
+            to {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            {{pdf_name}}s content
+        </div>
+        <div class="toggle-button" onclick="toggleMenu()">☰</div>
+        <ul class="nav-links">
+            <li><a href="http://hanjeonghyun.pythonanywhere.com/dashboard">Dashboard</a></li>
+            <li><a id="sideopen" href="#">Settings</a></li>
+        </ul>
+    </nav>
+    <!--<img src="data:image/png;base64,{{images[0]}}">-->
+    <div id="textDisplayArea">
+        <div id="currentSentence">이전 문장입니다.</div>
+        <div id="wordDisplay" class="animate" onclick="submitWord()">단어 표시 영역</div>
+        <div id="nextSentence">다음 문장입니다.</div>
+    </div>
+
+
+    <div id="setting">
+        <!-- 기존 색상 설정 -->
+        <div>
+            <input type="color" id="head" name="head" value="#e66465">
+            <label for="head">배경색</label>
+        </div>
+        <div>
+            <input type="color" id="body" name="body" value="#f6b73c">
+            <label for="body">가운데글씨</label>
+        </div>
+        <!-- 문장 표시 설정 -->
+        <div>
+            <input type="checkbox" id="toggleSentences" checked>
+            <label for="toggleSentences">문장 표시/숨기기</label>
+        </div>
+        <!-- 시야 조절 -->
+        <div>
+            <input type="checkbox" id="narrowFocus">
+            <label for="narrowFocus">시야 좁히기</label>
+        </div>
+    </div>
+
+    <div id="controls">
+        <button onclick="previousWord()">이전</button>
+        <button onclick="playPause()">재생/일시정지</button>
+        <button onclick="nextWord()">다음</button>
+    </div>
+
+    <div id="wordRateDisplay">Words per minute: 0</div>
+    <input type="range" id="speedControl" min="1600" max="2000" step="10" value="1700">
+    <input type="range" id="speedControl2" min="0" max="1000" step="10" value="500">
+    <script>
+        const content = {{ content | tojson | safe }};
+        var index = {{ index_far | safe }};
+        var page_index = 0;
+
+        var pdf_name = "{{ pdf_name }}";
+        var playing = false;
+        var displayInterval = null;
+
+        function submitWord() {
+            window.location.href = `/pdf_reader/${pdf_name}/${index}/0`;
+        }
+
+        document.getElementById("toggleSentences").addEventListener("change", function() {
+            let displaySetting = this.checked ? "block" : "none";
+            document.getElementById("currentSentence").style.display = displaySetting;
+            document.getElementById("nextSentence").style.display = displaySetting;
+        });
+
+        document.getElementById("narrowFocus").addEventListener("change", function() {
+            let focusClass = this.checked ? "narrow" : "";
+            document.getElementById("textDisplayArea").className = focusClass;
+        });
+
+        function calculateSegment(index) {
+            return Math.ceil(index / 5);
+        }
+
+        function updateWordDisplay() {
+            if (index < content.length && index >= 0) {
+                document.getElementById("wordDisplay").textContent = content[index];
+                document.getElementById("wordDisplay").classList.remove("animate");
+                document.getElementById("wordDisplay").offsetWidth; // 애니메이션 초기화
+                document.getElementById("wordDisplay").classList.add("animate");
+
+                let previousWords = content.slice((calculateSegment(index) - 1) * 5, calculateSegment(index) * 5).join(" ");
+                document.getElementById("currentSentence").textContent = previousWords;
+
+                let nextWords = content.slice(calculateSegment(index) * 5, (calculateSegment(index) + 1) * 5).join(" ");
+                document.getElementById("nextSentence").textContent = nextWords;
+            }
+        }
+
+        function playPause() {
+
+            var delay = 0;
+
+            if (playing) {
+                clearInterval(displayInterval);
+                playing = false;
+            } else {
+                displayInterval = setInterval(function() {
+                    if (index < content.length) {
+                        if(content[index][content[index].length - 1] == '.'){
+                            delay = 10000;
+                        }
+                        else{
+                            delay = 0;
+                        }
+                        updateWordDisplay();
+                        updateIndexOnServer(pdf_name, index);
+                        index++;
+                    } else {
+                        clearInterval(displayInterval);
+                        playing = false;
+                    }
+                }, 2050 - parseInt(document.getElementById("speedControl").value) + delay);
+                playing = true;
+            }
+        }
+
+        function nextWord() {
+            if (index < content.length - 1) {
+                index++;
+                updateWordDisplay();
+            }
+        }
+
+        function previousWord() {
+            if (index > 0) {
+                index--;
+                updateWordDisplay();
+            }
+        }
+
+        document.getElementById("speedControl").addEventListener("input", function() {
+            var speed = parseInt(this.value);
+            var intervalDuration = 2050 - speed;
+            var wordsPerMinute = Math.round(60000 / intervalDuration);
+            // Display the words per minute
+            document.getElementById("wordRateDisplay").textContent = `Words per minute: ${wordsPerMinute}`;
+
+            if (playing) {
+                clearInterval(displayInterval); // 기존 인터벌을 정리합니다.
+                function displayNextWord() {
+                    if (index < content.length) {
+                        var delay = 0;
+                        if (content[index].endsWith('.') || content[index].endsWith('?') || content[index].endsWith('!')) {
+                            delay = parseInt(document.getElementById("speedControl2").value);
+                        }
+                        updateWordDisplay();
+                        updateIndexOnServer(pdf_name, index);
+                        index++;
+
+                        displayInterval = setTimeout(displayNextWord, intervalDuration + delay); // 다음 단어 표시를 위한 타이머 설정
+                    } else {
+                        clearTimeout(displayInterval);
+                        playing = false;
+                    }
+                }
+                displayNextWord(); // 첫 단어 표시를 시작합니다.
+            }
+        });
+
+        document.getElementById("head").addEventListener("change", function() {
+            document.getElementById("textDisplayArea").style.backgroundColor = document.getElementById("head").value;
+        });
+
+        document.getElementById("body").addEventListener("change", function() {
+            document.getElementById("wordDisplay").style.color = document.getElementById("body").value;
+        });
+        const openButton = document.getElementById('sideopen');
+        const setting = document.getElementById('setting');
+        openButton.onclick = function() {
+        setting.style.right = '0';
+        event.stopPropagation(); // 이벤트 버블링을 막습니다.
+         }
+
+        document.body.addEventListener('click', function(event) {
+        // 사이드 패널이 열려있고 사이드 패널 외부를 클릭했을 때
+        if (setting.style.right === '0px' && !setting.contains(event.target)) {
+            setting.style.right = '-220px'; // 사이드 패널을 다시 숨깁니다.
+        }
+         });
+
+
+
+        updateWordDisplay(); // 초기 단어 표시
+
+        function updateIndexOnServer(name, index) {
+            const xhr = new XMLHttpRequest();
+            const url = '/update_index';
+            var data = JSON.stringify({ 'pdfName': name, 'index': index });
+
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    console.log('인덱스가 서버에 업데이트되었습니다.');
+                }
+            };
+
+            xhr.send(data);
+        }
+
+    </script>
+</body>
+</html>

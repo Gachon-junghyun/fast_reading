@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Reader 2</title>
+    <style>
+        body, html {
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #d6eaff;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 10px;
+            display: flex;
+            transition: max-height 0.3s ease;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            padding: 10px 20px;
+            color: black;
+            background-color: #d6eaff;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #a9d3ff;
+        }
+
+        .span-container {
+            display: inline-block;
+            padding: 2px;
+            border: 1px solid transparent;
+        }
+
+        .span-container:hover {
+            border-color: black;
+        }
+
+        .page {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px;
+        }
+
+        #index-button {
+            width: 30%;
+            height: 40px;
+        }
+
+        .toggle-button {
+            display: none;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 600px) {
+            .nav-links {
+                flex-direction: column;
+                max-height: 0;
+                overflow: hidden;
+            }
+
+            .navbar {
+                flex-wrap: wrap;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .toggle-button {
+                font-size: 30px;
+                cursor: pointer;
+                display: block;
+                margin-left: auto;
+            }
+
+            .logo {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            {{pdf_name}}s content
+        </div>
+        <div class="toggle-button" onclick="toggleMenu()">☰</div>
+        <ul class="nav-links">
+            <li><a href="http://hanjeonghyun.pythonanywhere.com/dashboard">Dashboard</a></li>
+            <li><a href="#">Settings</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Logout</a></li>
+        </ul>
+    </nav>
+
+    <button id="index-button" onclick="goToIndex()">Go to Index</button>
+
+    <script>
+        // PDF 이름과 내용을 가정한 예시 데이터입니다.
+        const pdfName = "{{ pdf_name }}";
+        const content = {{ content | tojson }};
+        const mode = {{b}}
+
+        // 인덱스 페이지로 이동하는 함수
+        function goToIndex() {
+            window.location.href = `/play/{{pdf_name}}/s-{{oindex}}`;
+        }
+
+        // 메뉴 토글 함수
+        function toggleMenu() {
+            const navLinks = document.querySelector(".nav-links");
+            navLinks.classList.toggle("show");
+        }
+
+        function loadPDFContent() {
+            var index = 1;
+            var pageIndex = 1; // 페이지 인덱스 변수 추가
+            const container = document.getElementById("pdf-content");
+            container.innerHTML = ""; // 기존 내용을 초기화
+
+            var currentPageDiv = createPageDiv(pageIndex); // 현재 페이지 div 생성
+
+            content.forEach((text) => {
+                if (text === "NnNn") {
+                    pageIndex++; // 페이지 인덱스 증가
+                    currentPageDiv = createPageDiv(pageIndex); // 새 페이지 div 생성
+                } else {
+                    const span = document.createElement("span");
+                    span.textContent = text;
+                    span.className = "span-container";
+                    span.id = `s-${index}`;
+                    if ({{oindex}} > index) {
+                        span.style.color = "red";
+                    }
+                    span.onclick = function () { submitWord(pdfName, span.id); };
+                    currentPageDiv.appendChild(span);
+                    index++;
+                }
+                if (text[text.length - 1] == ".") {
+                    const br = document.createElement("br");
+                    currentPageDiv.appendChild(br);
+                }
+
+            });
+        }
+
+        // 페이지를 나타내는 div를 생성하는 함수
+        function createPageDiv(pageIndex) {
+            const container = document.getElementById("pdf-content");
+            const pageDiv = document.createElement("div");
+            pageDiv.className = "page";
+            pageDiv.id = `page-${pageIndex}`; // 페이지 div에 고유한 ID 부여
+            container.appendChild(pageDiv);
+            return pageDiv;
+        }
+
+        function submitWord(pdfName, index) {
+            // 단어를 클릭하면 해당 URL로 리다이렉트합니다.
+            window.location.href = `/play/{{pdf_name}}/${index}/${mode}`;
+        }
+
+        // 페이지 로드 시 PDF 내용을 로드
+        window.onload = loadPDFContent;
+    </script>
+
+    <div id="pdf-content"></div>
+
+</body>
+</html>
